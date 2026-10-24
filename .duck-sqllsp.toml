@@ -1,0 +1,20 @@
+#:schema ./duck-sqllsp.schema.json
+
+[duck_sqllsp]
+activeConnection = "local"
+dialect = "sqlite"
+requireConnection = false
+
+[duck_sqllsp.rules]
+# sql015 = "warning"
+# sql001 = "hint"
+
+[duck_sqllsp.style]
+# keywordCase = "upper"
+# functionCase = "lower"
+# typeCase = "upper"
+# identifierCase = "preserve"
+
+[[duck_sqllsp.connections]]
+name = "local"
+url = "sqlite:./data/app.db"

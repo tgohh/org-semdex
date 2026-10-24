@@ -1,0 +1,25 @@
+[package]
+name = "org-semdex"
+version = "0.1.0"
+edition = "2024"
+
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+anyhow = "1"
+emacs = "0.20"
+hannoy = "0.2.0"
+heed = "0.22.1"
+mistralrs = {
+    path = "/home/<user>/3rdParty/mistral.rs/mistralrs",
+    features = ["cuda", "flash-attn", "cudnn"]
+}
+rand = "0.10.2"
+rusqlite = { version = "0.40", features = ["cache"] }
+rusqlite_migration = "2.6.0"
+serde = "1.0.229"
+serde_json = "1.0.151"
+tokio = { version = "1", features = ["full"] }
+uuid = {version="1", features=["serde"]}

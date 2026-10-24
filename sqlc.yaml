@@ -1,0 +1,23 @@
+version: "2"
+
+plugins:
+  - name: sqlc-gen-rust
+    wasm:
+      url: https://github.com/tunamaguro/sqlc-gen-rust/releases/download/v0.1.12/sqlc-gen-rust.wasm
+      sha256: f434350fd09a485a3c9e94df4808c2d58f7f817937ed2e0654e9180eb96aa9ff
+
+sql:
+  - engine: "sqlite"
+    schema: "sql/schema"
+    queries: "sql/queries"
+
+    codegen:
+      - plugin: sqlc-gen-rust
+        out: "src/db"
+        options:
+          db_crate: "rusqlite"
+          output: "queries.rs"
+          overrides:
+          - column: .hnsw_update_queue.utype
+            rs_type: crate::types::HnswUpdateType
+          

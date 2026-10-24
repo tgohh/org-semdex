@@ -1,0 +1,23 @@
+diff --git a/mistralrs/src/model.rs b/mistralrs/src/model.rs
+index 87d8a20e5..6883e2aa3 100644
+--- a/mistralrs/src/model.rs
++++ b/mistralrs/src/model.rs
+@@ -113,6 +113,18 @@ impl Model {
+         self.stream_chat_request_with_model(request, None).await
+     }
+ 
++    // ========================================================================
++    // addition by YOURS TRULY!!!
++    // ========================================================================    
++    
++    pub async fn shutdown(self) -> std::result::Result<(), String> {
++        self.runner.shutdown().await
++    }
++
++    // ========================================================================
++    // addition by YOURS TRULY!!!
++    // ========================================================================
++
+     /// Generate with a specific model (streaming).
+     /// If `model_id` is `None`, the request is sent to the default model.
+     pub async fn stream_chat_request_with_model<R: RequestLike>(

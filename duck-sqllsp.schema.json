@@ -1,0 +1,757 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "duck-sqllsp project configuration",
+  "description": "Unofficial JSON Schema for duck-sqllsp project configuration, derived from dsl-server/src/config.rs, dsl-format/src/style.rs, dsl-conn/src/spec.rs, and the configuration reference on 2026-08-29. Supports wrapped and bare configs, plus camelCase and snake_case aliases.",
+  "oneOf": [
+    {
+      "$ref": "#/definitions/wrappedConfig"
+    },
+    {
+      "$ref": "#/definitions/config"
+    }
+  ],
+  "definitions": {
+    "severity": {
+      "type": "string",
+      "enum": [
+        "error",
+        "warning",
+        "info",
+        "hint",
+        "off",
+        "ignore",
+        "none"
+      ],
+      "description": "Rule severity. \"ignore\" and \"none\" are synonyms for \"off\"."
+    },
+    "connection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "url"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Connection name; activeConnection refers to this value."
+        },
+        "url": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(postgres://|postgresql://|mysql://|mariadb://|sqlite:)",
+          "description": "Database URL. Supported connection schemes are postgres/postgresql, mysql/mariadb, and sqlite. For a relative SQLite file use e.g. sqlite:./app.db."
+        }
+      }
+    },
+    "createTableStyle": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "alignColumns": {
+          "type": "boolean",
+          "default": true,
+          "description": "Align CREATE TABLE column fields."
+        },
+        "align_columns": {
+          "type": "boolean",
+          "default": true,
+          "description": "Snake-case alias for alignColumns."
+        },
+        "openParenOnNewLine": {
+          "type": "boolean",
+          "default": true,
+          "description": "Put the opening parenthesis on its own line."
+        },
+        "open_paren_on_new_line": {
+          "type": "boolean",
+          "default": true,
+          "description": "Snake-case alias for openParenOnNewLine."
+        },
+        "constraintsAtEnd": {
+          "type": "boolean",
+          "default": true,
+          "description": "Move table-level constraints after columns."
+        },
+        "constraints_at_end": {
+          "type": "boolean",
+          "default": true,
+          "description": "Snake-case alias for constraintsAtEnd."
+        },
+        "columnGap": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 4,
+          "description": "Spaces between aligned CREATE TABLE sub-columns."
+        },
+        "column_gap": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 4,
+          "description": "Snake-case alias for columnGap."
+        },
+        "groupIndexes": {
+          "type": "boolean",
+          "default": true,
+          "description": "Pack consecutive CREATE INDEX statements without blank lines."
+        },
+        "group_indexes": {
+          "type": "boolean",
+          "default": true,
+          "description": "Snake-case alias for groupIndexes."
+        }
+      },
+      "allOf": [
+        {
+          "not": {
+            "required": [
+              "alignColumns",
+              "align_columns"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "openParenOnNewLine",
+              "open_paren_on_new_line"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "constraintsAtEnd",
+              "constraints_at_end"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "columnGap",
+              "column_gap"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "groupIndexes",
+              "group_indexes"
+            ]
+          }
+        }
+      ]
+    },
+    "formatterStyle": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "language": {
+          "type": "string",
+          "default": "postgresql",
+          "description": "sql-formatter language/dialect. When left at the default, duck-sqllsp may drive it from the open buffer dialect."
+        },
+        "tabWidth": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 4,
+          "description": "Indent width for CREATE TABLE formatting."
+        },
+        "tab_width": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 4,
+          "description": "Snake-case alias for tabWidth."
+        },
+        "keywordCase": {
+          "type": "string",
+          "enum": [
+            "upper",
+            "lower",
+            "preserve"
+          ],
+          "default": "upper",
+          "description": "Keyword case used by the formatter."
+        },
+        "keyword_case": {
+          "type": "string",
+          "enum": [
+            "upper",
+            "lower",
+            "preserve"
+          ],
+          "default": "upper",
+          "description": "Snake-case alias for keywordCase."
+        },
+        "linesBetweenQueries": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 1,
+          "description": "Blank lines between statements."
+        },
+        "lines_between_queries": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 1,
+          "description": "Snake-case alias for linesBetweenQueries."
+        },
+        "dataTypeCase": {
+          "type": "string",
+          "enum": [
+            "upper",
+            "lower",
+            "preserve"
+          ],
+          "default": "preserve",
+          "description": "Data-type case used by sql-formatter."
+        },
+        "data_type_case": {
+          "type": "string",
+          "enum": [
+            "upper",
+            "lower",
+            "preserve"
+          ],
+          "default": "preserve",
+          "description": "Snake-case alias for dataTypeCase."
+        },
+        "functionCase": {
+          "type": "string",
+          "enum": [
+            "upper",
+            "lower",
+            "preserve"
+          ],
+          "default": "lower",
+          "description": "Function-name case used by sql-formatter."
+        },
+        "function_case": {
+          "type": "string",
+          "enum": [
+            "upper",
+            "lower",
+            "preserve"
+          ],
+          "default": "lower",
+          "description": "Snake-case alias for functionCase."
+        },
+        "denseOperators": {
+          "type": "boolean",
+          "default": false,
+          "description": "Collapse spaces around operators."
+        },
+        "dense_operators": {
+          "type": "boolean",
+          "default": false,
+          "description": "Snake-case alias for denseOperators."
+        },
+        "newlineBeforeSemicolon": {
+          "type": "boolean",
+          "default": false,
+          "description": "Place a trailing semicolon on its own line."
+        },
+        "newline_before_semicolon": {
+          "type": "boolean",
+          "default": false,
+          "description": "Snake-case alias for newlineBeforeSemicolon."
+        },
+        "expressionWidth": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 80,
+          "description": "Maximum expression width before wrapping."
+        },
+        "expression_width": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 80,
+          "description": "Snake-case alias for expressionWidth."
+        },
+        "logicalOperatorNewline": {
+          "type": "string",
+          "enum": [
+            "before",
+            "after"
+          ],
+          "default": "before",
+          "description": "Whether AND/OR appear before or after a line break."
+        },
+        "logical_operator_newline": {
+          "type": "string",
+          "enum": [
+            "before",
+            "after"
+          ],
+          "default": "before",
+          "description": "Snake-case alias for logicalOperatorNewline."
+        },
+        "singleLine": {
+          "type": "boolean",
+          "default": false,
+          "description": "Collapse each DML statement onto one line; DDL is left alone."
+        },
+        "single_line": {
+          "type": "boolean",
+          "default": false,
+          "description": "Snake-case alias for singleLine."
+        },
+        "compactClauses": {
+          "type": "boolean",
+          "default": false,
+          "description": "Keep each top-level clause on one line. Ignored when singleLine is true."
+        },
+        "compact_clauses": {
+          "type": "boolean",
+          "default": false,
+          "description": "Snake-case alias for compactClauses."
+        }
+      },
+      "allOf": [
+        {
+          "not": {
+            "required": [
+              "tabWidth",
+              "tab_width"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "keywordCase",
+              "keyword_case"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "linesBetweenQueries",
+              "lines_between_queries"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "dataTypeCase",
+              "data_type_case"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "functionCase",
+              "function_case"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "denseOperators",
+              "dense_operators"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "newlineBeforeSemicolon",
+              "newline_before_semicolon"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "expressionWidth",
+              "expression_width"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "logicalOperatorNewline",
+              "logical_operator_newline"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "singleLine",
+              "single_line"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "compactClauses",
+              "compact_clauses"
+            ]
+          }
+        }
+      ]
+    },
+    "style": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "keywordCase": {
+          "type": "string",
+          "enum": [
+            "upper",
+            "lower",
+            "preserve"
+          ],
+          "default": "upper",
+          "description": "Case for SQL keyword completion labels/inserts."
+        },
+        "keyword_case": {
+          "type": "string",
+          "enum": [
+            "upper",
+            "lower",
+            "preserve"
+          ],
+          "default": "upper",
+          "description": "Snake-case alias for keywordCase."
+        },
+        "functionCase": {
+          "type": "string",
+          "enum": [
+            "upper",
+            "lower",
+            "preserve"
+          ],
+          "default": "lower",
+          "description": "Case for SQL function completion labels/inserts."
+        },
+        "function_case": {
+          "type": "string",
+          "enum": [
+            "upper",
+            "lower",
+            "preserve"
+          ],
+          "default": "lower",
+          "description": "Snake-case alias for functionCase."
+        },
+        "typeCase": {
+          "type": "string",
+          "enum": [
+            "upper",
+            "lower",
+            "preserve"
+          ],
+          "default": "upper",
+          "description": "Case for SQL type completion labels/inserts."
+        },
+        "type_case": {
+          "type": "string",
+          "enum": [
+            "upper",
+            "lower",
+            "preserve"
+          ],
+          "default": "upper",
+          "description": "Snake-case alias for typeCase."
+        },
+        "identifierCase": {
+          "type": "string",
+          "enum": [
+            "upper",
+            "lower",
+            "preserve"
+          ],
+          "default": "preserve",
+          "description": "Case for schema/table/column identifiers."
+        },
+        "identifier_case": {
+          "type": "string",
+          "enum": [
+            "upper",
+            "lower",
+            "preserve"
+          ],
+          "default": "preserve",
+          "description": "Snake-case alias for identifierCase."
+        },
+        "createTable": {
+          "$ref": "#/definitions/createTableStyle"
+        },
+        "create_table": {
+          "$ref": "#/definitions/createTableStyle"
+        },
+        "formatter": {
+          "$ref": "#/definitions/formatterStyle"
+        }
+      },
+      "allOf": [
+        {
+          "not": {
+            "required": [
+              "keywordCase",
+              "keyword_case"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "functionCase",
+              "function_case"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "typeCase",
+              "type_case"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "identifierCase",
+              "identifier_case"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "createTable",
+              "create_table"
+            ]
+          }
+        }
+      ]
+    },
+    "configNoSchema": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "activeConnection": {
+          "type": "string",
+          "description": "Name of the connection to introspect against."
+        },
+        "active_connection": {
+          "type": "string",
+          "description": "Snake-case alias for activeConnection."
+        },
+        "connections": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/definitions/connection"
+          }
+        },
+        "dialect": {
+          "type": "string",
+          "enum": [
+            "postgresql",
+            "postgres",
+            "pg",
+            "mysql",
+            "mariadb",
+            "sqlite",
+            "sqlite3",
+            "mssql",
+            "sqlserver",
+            "tsql",
+            "transactsql"
+          ],
+          "description": "SQL dialect. Aliases are accepted by duck-sqllsp."
+        },
+        "requireConnection": {
+          "type": "boolean",
+          "default": true,
+          "description": "When true, suppress catalog-dependent diagnostics if no connection is active."
+        },
+        "require_connection": {
+          "type": "boolean",
+          "default": true,
+          "description": "Snake-case alias for requireConnection."
+        },
+        "scope": {
+          "type": "string",
+          "description": "Reserved for scoping introspection; currently unused."
+        },
+        "rules": {
+          "type": "object",
+          "default": {},
+          "description": "Per-rule severity overrides. Keys are diagnostic codes such as sql015.",
+          "patternProperties": {
+            "^sql[0-9]{3}$": {
+              "$ref": "#/definitions/severity"
+            }
+          },
+          "additionalProperties": false
+        },
+        "style": {
+          "$ref": "#/definitions/style"
+        }
+      },
+      "allOf": [
+        {
+          "not": {
+            "required": [
+              "activeConnection",
+              "active_connection"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "requireConnection",
+              "require_connection"
+            ]
+          }
+        }
+      ],
+      "x-taplo": {
+        "initKeys": [
+          "dialect",
+          "requireConnection",
+          "style",
+          "connections"
+        ]
+      }
+    },
+    "config": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$schema": {
+          "type": "string",
+          "description": "Optional JSON-schema URI/path when using .duck-sqllsp.json. For TOML, prefer Taplo's #:schema directive."
+        },
+        "activeConnection": {
+          "type": "string",
+          "description": "Name of the connection to introspect against."
+        },
+        "active_connection": {
+          "type": "string",
+          "description": "Snake-case alias for activeConnection."
+        },
+        "connections": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/definitions/connection"
+          }
+        },
+        "dialect": {
+          "type": "string",
+          "enum": [
+            "postgresql",
+            "postgres",
+            "pg",
+            "mysql",
+            "mariadb",
+            "sqlite",
+            "sqlite3",
+            "mssql",
+            "sqlserver",
+            "tsql",
+            "transactsql"
+          ],
+          "description": "SQL dialect. Aliases are accepted by duck-sqllsp."
+        },
+        "requireConnection": {
+          "type": "boolean",
+          "default": true,
+          "description": "When true, suppress catalog-dependent diagnostics if no connection is active."
+        },
+        "require_connection": {
+          "type": "boolean",
+          "default": true,
+          "description": "Snake-case alias for requireConnection."
+        },
+        "scope": {
+          "type": "string",
+          "description": "Reserved for scoping introspection; currently unused."
+        },
+        "rules": {
+          "type": "object",
+          "default": {},
+          "description": "Per-rule severity overrides. Keys are diagnostic codes such as sql015.",
+          "patternProperties": {
+            "^sql[0-9]{3}$": {
+              "$ref": "#/definitions/severity"
+            }
+          },
+          "additionalProperties": false
+        },
+        "style": {
+          "$ref": "#/definitions/style"
+        }
+      },
+      "allOf": [
+        {
+          "not": {
+            "required": [
+              "activeConnection",
+              "active_connection"
+            ]
+          }
+        },
+        {
+          "not": {
+            "required": [
+              "requireConnection",
+              "require_connection"
+            ]
+          }
+        }
+      ],
+      "x-taplo": {
+        "initKeys": [
+          "dialect",
+          "requireConnection",
+          "style",
+          "connections"
+        ]
+      }
+    },
+    "wrappedConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "$schema": {
+          "type": "string",
+          "description": "Optional JSON-schema URI/path when using .duck-sqllsp.json. For TOML, prefer Taplo's #:schema directive."
+        },
+        "duckSqllsp": {
+          "$ref": "#/definitions/configNoSchema"
+        },
+        "duck_sqllsp": {
+          "$ref": "#/definitions/configNoSchema"
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "duckSqllsp"
+          ]
+        },
+        {
+          "required": [
+            "duck_sqllsp"
+          ]
+        }
+      ]
+    }
+  }
+}
